@@ -1,4 +1,4 @@
-#Game end condition
+#Final touch
 
 import pygame
 import random
@@ -22,17 +22,29 @@ class Snake():
         x,y = self.direction
         #Move in that direction
         next = ((head[0]+x*gridsize)%WIDTH , (head[1]+y*gridsize)%HEIGHT)
-        #check_game_end()
         
         self.position.insert(0,next)
         self.position.pop()
     
-    def check_game_end(self):
+    def check_game_end(self, window):
         if self.position[0] in self.position[1:]:
-            print("game end")            
+            #print("game end")
+            global Highscore
+            Highscore = self.score if self.score > Highscore else Highscore
+            
+            myfont = pygame.font.SysFont('Comic Sans MS', 25)
+            text = myfont.render("Game Over", True , (0, 0, 0))
+            text_rect = text.get_rect(center=(WIDTH//2, HEIGHT//2 - 20))
+            
+            myfont2 = pygame.font.SysFont('Comic Sans MS', 10)
+            text2 = myfont.render("Restarts Automatically", True , (0, 0, 0))
+            text2_rect = text2.get_rect(center=(WIDTH//2, HEIGHT//2 ))
+            
+            window.blit(text,text_rect)
+            window.blit(text2,text2_rect)           
+            pygame.display.update()
+            pygame.time.delay(3000)
             self.__init__()
-        pass
-        
     
     def change_direction(self):
         for event in pygame.event.get():
@@ -48,7 +60,7 @@ class Snake():
                         self.direction = left  
                 elif event.key == pygame.K_RIGHT:
                     if not self.direction == left:
-                        self.direction = right  
+                        self.direction = right     
     
 class Food():
     def __init__(self):
@@ -57,15 +69,15 @@ class Food():
         
     def draw_food(self,window):
         pygame.draw.rect(window, self.color, (self.position[0], self.position[1], gridsize, gridsize))
-        #print((self.position[0]*grids, self.position[1]*grids, gridsize, gridsize))
 
 
 WIDTH = 400
 HEIGHT = 400
 
 grids = 20
-
 gridsize = WIDTH//grids
+
+Highscore = 0
 
 #Defining directions
 up = (0,-1)
@@ -75,6 +87,7 @@ right = (1,0)
 
 def setBackground(window):
     window.fill((175, 215, 70))
+    #pygame.display.update()
 
 def main():    
     pygame.init()
@@ -86,12 +99,13 @@ def main():
     snake = Snake()
     food = Food()
     
+    myfont = pygame.font.SysFont('Comic Sans MS', 20)
     while True:
         clock.tick(12)    #12 frames per second
         snake.movement()
-        snake.check_game_end()
+        snake.check_game_end(window)
         setBackground(window)
-        
+        snake.check_game_end(window)
         snake.drawSnake(window)
         food.draw_food(window)
         for event in pygame.event.get():
@@ -119,14 +133,20 @@ def main():
                         
         #Food Eating code
         if food.position == snake.position[0]:
-            print("Food Eaten")
+            #print("Food Eaten")
             snake.length += 1
+            snake.score += 1
             snake.position.append((2*snake.position[-1][0] - snake.position[-2][0], \
                                   2*snake.position[-1][1] - snake.position[-2][1]))
             food.__init__()
 
+        
+        text = myfont.render('Score: {}'.format(snake.score), True , (0, 0, 0))
+        text2 = myfont.render('HighScore: {}'.format(Highscore), True , (0, 0, 0))
+        window.blit(text,(0,0))
+        window.blit(text2,(0,20))
         pygame.display.update()
-    
+
     return
    
 main()
