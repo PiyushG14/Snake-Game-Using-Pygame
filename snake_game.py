@@ -1,4 +1,4 @@
-#Draw a moving snake
+#Food setting
 
 import pygame
 import random
@@ -27,10 +27,6 @@ class Snake():
         self.position.insert(0,next)
         self.position.pop()
     
-    def check_game_end(self):
-        pass
-        
-    
     def change_direction(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -46,15 +42,16 @@ class Snake():
                 elif event.key == pygame.K_RIGHT:
                     if not self.direction == left:
                         self.direction = right  
-       
-        
-    
-    
-    
+                        
 class Food():
     def __init__(self):
-        pass
-    
+        self.position = (random.randint(0, WIDTH)//grids*grids, random.randint(0, WIDTH)//grids*grids)
+        self.color = (0, 0, 0)
+        
+    def draw_food(self,window):
+        pygame.draw.rect(window, self.color, (self.position[0], self.position[1], gridsize, gridsize))
+        #print((self.position[0]*grids, self.position[1]*grids, gridsize, gridsize))
+
 
 WIDTH = 400
 HEIGHT = 400
@@ -84,14 +81,13 @@ def main():
     food = Food()
     
     while True:
-        clock.tick(10)    #12 frames per second
-        #pygame.time.delay(50)
-    
+        clock.tick(12)    #12 frames per second
         snake.movement()
-        
+        #snake.check_game_end()
         setBackground(window)
         
         snake.drawSnake(window)
+        food.draw_food(window)
         for event in pygame.event.get():
             
             if event.type == pygame.QUIT:
@@ -114,6 +110,14 @@ def main():
                 elif event.key == pygame.K_RIGHT:
                     if not snake.direction == left:
                         snake.direction = right  
+                        
+        #Food Eating code
+        if food.position == snake.position[0]:
+            print("Food Eaten")
+            snake.length += 1
+            snake.position.append((2*snake.position[-1][0] - snake.position[-2][0], \
+                                  2*snake.position[-1][1] - snake.position[-2][1]))
+            food.__init__()
 
         pygame.display.update()
     
