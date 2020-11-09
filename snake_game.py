@@ -1,4 +1,4 @@
-#Food setting
+#Game end condition
 
 import pygame
 import random
@@ -27,6 +27,13 @@ class Snake():
         self.position.insert(0,next)
         self.position.pop()
     
+    def check_game_end(self):
+        if self.position[0] in self.position[1:]:
+            print("game end")            
+            self.__init__()
+        pass
+        
+    
     def change_direction(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -42,7 +49,7 @@ class Snake():
                 elif event.key == pygame.K_RIGHT:
                     if not self.direction == left:
                         self.direction = right  
-                        
+    
 class Food():
     def __init__(self):
         self.position = (random.randint(0, WIDTH)//grids*grids, random.randint(0, WIDTH)//grids*grids)
@@ -68,7 +75,6 @@ right = (1,0)
 
 def setBackground(window):
     window.fill((175, 215, 70))
-    #pygame.display.update()
 
 def main():    
     pygame.init()
@@ -83,7 +89,7 @@ def main():
     while True:
         clock.tick(12)    #12 frames per second
         snake.movement()
-        #snake.check_game_end()
+        snake.check_game_end()
         setBackground(window)
         
         snake.drawSnake(window)
